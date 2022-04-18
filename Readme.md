@@ -6,7 +6,7 @@ All the data, then gets merged into the database in the Warehouse. It also gets 
 
 ## Installation
 
-All modules can be installed and facilitated with ARM templates (Azure Resource Management): [Use ARM templates to setup and maintain this module](https://github.com/Bygdrift/Warehouse.Modules.Example/blob/master/Deploy).
+All modules can be installed and facilitated with ARM templates (Azure Resource Management): [Use ARM templates to setup and maintain this module](https://github.com/hillerod/Warehouse.Modules.HFORS/blob/master/Deploy).
 
 ## Database content
 
