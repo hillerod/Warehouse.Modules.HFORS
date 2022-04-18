@@ -1,6 +1,8 @@
 # Warehouse module: HFORS
 
-This module connects to 'Hillerød Forsyning' through a FTPS connection and downloads all csv-files, containing information about heat consumption. It is not saved in a normal CSV-format, but in a weird EK109-format from KMD, so the module, first have to convert the file into real CSV. All the data, then gets merged into a database in the Warehouse.
+This module connects to 'Hillerød Forsyning' through a FTPS connection and downloads all csv-files, containing information about heat consumption.
+The csv from the FTP is not a correct CSV, but in a format called `EK109`, invented by KMD. So the module first have to convert the file into correct CSV.
+All the data, then gets merged into the database in the Warehouse. It also gets saved into the datalake in the raw format and refined.
 
 ## Installation
 

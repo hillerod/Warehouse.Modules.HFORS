@@ -54,7 +54,7 @@ namespace Module.Refines.Helpers
                     var c = 1;
                     var row = new Dictionary<int, object>();
                     if (addId)
-                        row.Add(c++, dRow.Aflæst.ToString("yyyyMMddTHHmmss") + "_" + dRow.Målernummer);
+                        row.Add(c++, dRow.Målernummer + "_" + dRow.Aflæst.ToString("yyyyMMddTHHmmss"));
                     
                     row.Add(c++, dRow.Installation);
                     row.Add(c++, dRow.Målernummer);

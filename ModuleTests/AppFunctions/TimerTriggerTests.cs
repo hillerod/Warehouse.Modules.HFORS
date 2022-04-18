@@ -45,12 +45,8 @@ namespace ModuleTests.Refines
             var infos = function.App.Log.GetLogs(LogType.Information).ToList();
             Assert.AreEqual(4, infos.Count);
 
-            //Is data uploaded to datalake?:
-            //Assert.IsTrue(function.App.DataLake.FileExist("Raw", "Data.txt", FolderStructure.DatePath));
-            //Assert.IsTrue(function.App.DataLake.FileExist("Refined", "Data.csv", FolderStructure.DatePath));
-
             //Is data uploaded to database?:
-            var csvFromDb = function.App.Mssql.GetAsCsv("Data");
+            var csvFromDb = function.App.Mssql.GetAsCsv("Forbrug");
             Assert.IsTrue(csvFromDb.RowCount > 0);
         }
     }
