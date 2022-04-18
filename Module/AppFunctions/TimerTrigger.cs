@@ -19,7 +19,7 @@ namespace Module.AppFunctions
 
             var ftpService = new FTPService(App);
             foreach (var file in ftpService.GetData())
-                await Refines.FileRefine.Refine(App, file);
+                await Refines.ConsumptionRefine.Refine(App, file);
 
             ftpService.MoveFolderContent("Backup");
         }

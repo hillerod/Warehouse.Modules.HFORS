@@ -29,7 +29,7 @@ namespace ModuleTests.Refines
             await function.App.DataLake.DeleteDirectoryAsync("", FolderStructure.Path);
 
             //Clear the database for the two tables:
-            function.App.Mssql.DeleteTable("Data");
+            function.App.Mssql.DeleteTable("Forbrug");
 
             //Run the function:
             await function.TimerTriggerAsync(default);

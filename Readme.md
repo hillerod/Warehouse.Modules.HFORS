@@ -1,12 +1,6 @@
-# Warehouse module: Example
+# Warehouse module: HFORS
 
-This module is both a 'hello world' example and a start install, you can use for building a new module.
-
-The module is build with [Bygdrift Warehouse](https://github.com/Bygdrift/Warehouse), that enables one to attach multiple modules within the same azure environment, that can collects and wash data from all kinds of services, in a cheap data lake and database.
-By saving data to a MS SQL database, it is:
-- easy to fetch data with Power BI, Excel and other systems
-- easy to control who has access to what - actually, it can be controlled with AD so you don't have to handle credentials
-- It's cheap
+This module connects to 'Hillerød Forsyning' through a FTPS connection and downloads all csv-files, containing information about heat consumption. It is not saved in a normal CSV-format, but in a weird EK109-format from KMD, so the module, first have to convert the file into real CSV. All the data, then gets merged into a database in the Warehouse.
 
 ## Installation
 
@@ -14,41 +8,59 @@ All modules can be installed and facilitated with ARM templates (Azure Resource 
 
 ## Database content
 
-| TABLE_NAME      | COLUMN_NAME     | DATA_TYPE |
-| :-------------- | :-------------- | :-------- |
-| Data            | Id              | int       |
-| Data            | Text            | varchar   |
-| Data            | Date            | datetime  |
-| Data            | DataFromSetting | varchar   |
-| Data            | DataFromSecret  | varchar   |
-| DataAccumulated | Id              | int       |
-| DataAccumulated | Text            | varchar   |
-| DataAccumulated | Date            | datetime  |
-| DataAccumulated | DataFromSetting | varchar   |
-| DataAccumulated | DataFromSecret  | varchar   |
+| TABLE_NAME     | COLUMN_NAME    | DATA_TYPE |
+| :------------- | :------------- | :-------- |
+| Forbrug        | Id             | varchar   |
+| Forbrug        | Installation   | varchar   |
+| Forbrug        | Målernummer    | int       |
+| Forbrug        | Energiartskode | varchar   |
+| Forbrug        | Aflæst         | datetime  |
+| Forbrug        | GældendeFra    | varchar   |
+| Forbrug        | Note           | varchar   |
+| Forbrug        | Energi_Værdi   | float     |
+| Forbrug        | Energi_Enhed   | varchar   |
+| Forbrug        | Energi_Type    | int       |
+| Forbrug        | Volumen_Værdi  | float     |
+| Forbrug        | Volumen_Enhed  | varchar   |
+| Forbrug        | Volumen_Type   | int       |
+| Forbrug        | Timer_Værdi    | float     |
+| Forbrug        | Timer_Enhed    | varchar   |
+| Forbrug        | Timer_Type     | int       |
+| Forbrug        | Fremløb_Værdi  | float     |
+| Forbrug        | Fremløb_Enhed  | varchar   |
+| Forbrug        | Fremløb_Type   | int       |
+| Forbrug        | Returløb_Værdi | float     |
+| Forbrug        | Returløb_Enhed | varchar   |
+| Forbrug        | Returløb_Type  | int       |
+| Typekode       | Kode           | int       |
+| Typekode       | Type           | varchar   |
+| Typekode       | Beskrivelse    | varchar   |
+| Energiartskode | Kode           | int       |
+| Energiartskode | Energiart      | varchar   |
+| Energiartskode | Beskrivelse    | varchar   |
+| Artskode       | Kode           | int       |
+| Artskode       | Målepunktsart  | varchar   |
+| Artskode       | Beskrivelse    | varchar   |
+| Enhedskode     | Enhedskode     | varchar   |
+| Enhedskode     | Enhed          | varchar   |
+| Enhedskode     | Beskrivelse    | varchar   |
 
 ## Data lake content
 
-In the data lake container with this modules name, there are three main folders `Drawings`, `Raw` and `Refined`.
+In the data lake container with this modules name, there are two main folders `Raw` and `Refined`.
 
  The folder structure:
 
 + Raw
     - {yyyy the year}
         - {MM the month}
-            - {dd the month}
-                - Data.txt
+            - {dd the day}
+                - TheNameOfTheCsvFile.csv
 + Refined
     - {yyyy the year}
         - {MM the month}
-            - {dd the month}
-                - Data.csv
-
-# Updates
-
-## 0.3.3
-
-In 0.3.2, all user settings should have a prefix of 'Setting--'. That has been removed, so when upgrading from 0.3.2, then go this module's Configuration and find `Setting--DataFromSetting` and change it to `DataFromSetting`.
+            - {dd the day}
+                - TheNameOfTheCsvFile.csv
 
 # License
 
