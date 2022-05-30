@@ -12,16 +12,16 @@ Install the [Warehouse environment](https://github.com/Bygdrift/Warehouse/tree/m
 
 2022-01-28: [Update an already installed module, once a new update has been pushed to GitHub](https://www.youtube.com/watch?v=XywfV_n-320) (in Danish):
 
-## Setup the Warehouse environment with the portal:
+## Add this module:
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Bygdrift/Warehouse/master/Docs/Images/deploytoazureButton.svg)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FBygdrift%2FWarehouse.Modules.Example%2Fmaster%2FDeploy%2FWarehouse.Modules.Example_ARM.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Bygdrift/Warehouse/master/Docs/Images/deploytoazureButton.svg)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2hillerod%2FWarehouse.Modules.HFORS%2Fmaster%2FDeploy%2FWarehouse.Modules.HFORS_ARM.json)
 [![Visualize](https://raw.githubusercontent.com/Bygdrift/Warehouse/master/Docs/Images/visualizebutton.svg)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fhillerod%2FWarehouse.Modules.HFORS%2Fmaster%2FDeploy%2FWarehouse.Modules.HFORS_ARM.json)
 
 This will setup a Windows hosting plan and a function app that contains the software from this GitHub repository.
 
 If you have to change some settings, you can run the setup again, and it should not affect data, but better take backup to be sure.
 
-## Setup the environment with Azure CLI
+## Alternative: Add this module with Azure CLI
 
 You can also run the ARM from PowerShell.
 
