@@ -2,8 +2,11 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "FTPConnectionString": {
-            "value": "host=sftp-exchange.izarplus.eu;port=2222;user=xxx;pass=xxx;path=;"
+        "FTPConnectionCustomerData": {
+            "value": "host=sftp-exchange.izarplus.eu;port=2222;user=xxx;pass=xxx;path=customerdata;"
+        },
+        "FTPConnectionMeterReadings": {
+            "value": "host=sftp-exchange.izarplus.eu;port=2222;user=xxx;pass=xxx;path=meter-readings;"
         },
         "ScheduleExpression": {
             "value": "0 0 1 * * *"

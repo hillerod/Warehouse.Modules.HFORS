@@ -4,18 +4,25 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.5.6.12127",
-      "templateHash": "874761582416675237"
+      "version": "0.6.11.53198",
+      "templateHash": "6166399124007717236"
     }
   },
   "parameters": {
-    "FTPConnectionString": {
-      "type": "secureString",
-      "defaultValue": ""
+    "FTPConnectionCustomerData": {
+      "type": "string",
+      "defaultValue": "host=sftp-exchange.izarplus.eu;port=2222;user=xxx;pass=xxx;path=customerdata;"
+    },
+    "FTPConnectionMeterReadings": {
+      "type": "string",
+      "defaultValue": "host=sftp-exchange.izarplus.eu;port=2222;user=xxx;pass=xxx;path=meter-readings;"
     },
     "ScheduleExpression": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "0 0 1 * * *",
+      "metadata": {
+        "description": "How often this module should fetch data from API. This example runs each night at 1AM UTC. Read more here: https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer"
+      }
     },
     "moduleName": {
       "type": "string",
@@ -41,9 +48,17 @@
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
       "apiVersion": "2019-09-01",
-      "name": "[format('{0}/{1}', format('keyvault-{0}', uniqueString(resourceGroup().id)), format('Secret--{0}--DataFromSecret', parameters('moduleName')))]",
+      "name": "[format('{0}/{1}', format('keyvault-{0}', uniqueString(resourceGroup().id)), format('Secret--{0}--FTPConnectionCustomerData', parameters('moduleName')))]",
       "properties": {
-        "value": "[parameters('FTPConnectionString')]"
+        "value": "[parameters('FTPConnectionCustomerData')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2019-09-01",
+      "name": "[format('{0}/{1}', format('keyvault-{0}', uniqueString(resourceGroup().id)), format('Secret--{0}--FTPConnectionMeterReadings', parameters('moduleName')))]",
+      "properties": {
+        "value": "[parameters('FTPConnectionMeterReadings')]"
       }
     },
     {
