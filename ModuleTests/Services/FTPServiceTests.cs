@@ -16,7 +16,7 @@ namespace ModuleTests.Services
         public void CallTest()
         {
             App.Log.LogInformation($"The module '{App.ModuleName}' is started");
-            var ftpService = new Module.Services.FTPService(App);
+            var ftpService = new Module.Services.FTPService(App, App.Settings.FTPConnectionMeterReadings);
             var csvFiles = ftpService.GetData().ToList();
         }
     }

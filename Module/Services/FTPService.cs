@@ -10,10 +10,10 @@ namespace Module.Services
     public class FTPService
     {
         private readonly FTPClientHelper client;
-        public FTPService(AppBase<Settings> app)
+        public FTPService(AppBase<Settings> app, string connectionString)
         {
             App = app;
-            client = new FTPClientHelper(App.Settings.FTPConnectionString);
+            client = new FTPClientHelper(connectionString);
             try
             {
                 client.Connect();
@@ -28,10 +28,15 @@ namespace Module.Services
 
         public AppBase<Settings> App { get; }
 
-        public IEnumerable<(DateTime Saved, string Name, Stream stream)> GetData(int? take = null)
+        public IEnumerable<(DateTime Saved, string Name, Stream stream)> GetData(string path = null, int? take = null)
         {
             var count = 0;
-            foreach (var item in client.ListDirectory(FTPClientHelper.Path).Where(o => !o.IsDirectory))
+            
+            string combinedPath = FTPClientHelper.Path;
+            if(!string.IsNullOrEmpty(path))
+                combinedPath = Path.Combine(combinedPath, path);
+
+            foreach (var item in client.ListDirectory(combinedPath).Where(o => !o.IsDirectory))
             {
                 if (take != null && count++ == take)
                     break;
@@ -78,6 +83,18 @@ namespace Module.Services
             {
                 var sourceFilePath = FTPClientHelper.Path + "/" + item.Name;
                 client.DeleteFile(sourceFilePath);
+            }
+        }
+
+        /// <summary>
+        /// Closes connection
+        /// </summary>
+        public void Close()
+        {
+            if(client != null)
+            {
+                client.Disconnect();
+                client.Dispose();
             }
         }
     }

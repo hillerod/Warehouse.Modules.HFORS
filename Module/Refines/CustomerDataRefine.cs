@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 
 namespace Module.Refines
 {
-    public class ConsumptionRefine
+    public class CustomerDataRefine
     {
         public static async Task Refine(AppBase<Settings> app, (DateTime Saved, string Name, Stream stream) file)
         {
-            app.Log.LogInformation("Refining data...");
+            app.Log.LogInformation("Refining customer data...");
             app.LoadedLocal = file.Saved;
 
             await app.DataLake.SaveStreamAsync(file.stream, "Raw", file.Name, FolderStructure.DatePath);
+            var csv = new Csv().FromCsvStream(file.stream, ';').AddColumn("Indlæst", app.LoadedLocal, false);
 
-            var csv = Helpers.EK109.ToCsv(file.stream, true);
-            await app.DataLake.SaveCsvAsync(csv, "Refined", $"Data_{file.Saved:yyyyMMddTHHmmss}.csv", FolderStructure.DatePath);
-
-            app.Mssql.MergeCsv(csv, "Forbrug", "Id", false, false);
+            app.Mssql.MergeCsv(csv, "Målere", "device.serialNo", true, false);
         }
     }
 }

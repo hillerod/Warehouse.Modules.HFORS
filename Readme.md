@@ -46,6 +46,25 @@ All modules can be installed and facilitated with ARM templates (Azure Resource 
 | Enhedskode     | Enhedskode     | varchar   |
 | Enhedskode     | Enhed          | varchar   |
 | Enhedskode     | Beskrivelse    | varchar   |
+| Målere     | device.serialNo                           | int       |
+| Målere     | Qn                                        | int       |
+| Målere     | device.devicekey                          | varchar   |
+| Målere     | device.version                            | int       |
+| Målere     | device.manufacturer                       | varchar   |
+| Målere     | device.location.street                    | varchar   |
+| Målere     | device.location.streetnumber              | int       |
+| Målere     | device.location.streetnumberadd           | varchar   |
+| Målere     | device.location.floor                     | varchar   |
+| Målere     | device.location.room                      | varchar   |
+| Målere     | device.location.postcode                  | int       |
+| Målere     | device.location.city                      | varchar   |
+| Målere     | device.location.lng                       | decimal   |
+| Målere     | device.location.lat                       | decimal   |
+| Målere     | device.installDate                        | varchar   |
+| Målere     | device.location.consumerContact.contactId | int       |
+| Målere     | aftagernummer                             | bigint    |
+| Målere     | Indlæst                                   | datetime  |
+
 
 ## Data lake content
 
@@ -57,12 +76,13 @@ In the data lake container with this modules name, there are two main folders `R
     - {yyyy the year}
         - {MM the month}
             - {dd the day}
-                - TheNameOfTheCsvFile.csv
+                - Consumption data.csv
+                - Customer data.csv
 + Refined
     - {yyyy the year}
         - {MM the month}
             - {dd the day}
-                - TheNameOfTheCsvFile.csv
+                - Consumption data.csv
 
 # License
 

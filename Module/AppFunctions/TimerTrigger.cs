@@ -17,11 +17,19 @@ namespace Module.AppFunctions
         {
             App.Log.LogInformation($"The module '{App.ModuleName}' is started");
 
-            var ftpService = new FTPService(App);
+            var ftpService = new FTPService(App, App.Settings.FTPConnectionMeterReadings);
             foreach (var file in ftpService.GetData())
                 await Refines.ConsumptionRefine.Refine(App, file);
 
+            Refines.EK109ExplanationTables.Refine(App);
             ftpService.MoveFolderContent("Backup");
+            ftpService.Close();
+
+            ftpService = new FTPService(App, App.Settings.FTPConnectionCustomerData);
+            foreach (var file in ftpService.GetData())
+                await Refines.CustomerDataRefine.Refine(App, file);
+
+            ftpService.Close();
         }
     }
 }
