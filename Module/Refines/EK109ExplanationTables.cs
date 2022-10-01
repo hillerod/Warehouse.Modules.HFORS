@@ -1,10 +1,5 @@
-﻿using Bygdrift.CsvTools;
+﻿using Bygdrift.Tools.CsvTool;
 using Bygdrift.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Module.Refines
 {
@@ -12,10 +7,10 @@ namespace Module.Refines
     {
         public static void Refine(AppBase<Settings> app)
         {
-            app.Mssql.InserCsv(Typekode(), "Typekode", false, false);
-            app.Mssql.InserCsv(Energiartskode(), "Energiartskode", false, false);
-            app.Mssql.InserCsv(Artskode(), "Artskode", false, false);
-            app.Mssql.InserCsv(Enhedskode(), "Enhedskode", false, false);
+            app.Mssql.InsertCsv(Typekode(), "Typekode", false, false);
+            app.Mssql.InsertCsv(Energiartskode(), "Energiartskode", false, false);
+            app.Mssql.InsertCsv(Artskode(), "Artskode", false, false);
+            app.Mssql.InsertCsv(Enhedskode(), "Enhedskode", false, false);
         }
 
         private static Csv Typekode()

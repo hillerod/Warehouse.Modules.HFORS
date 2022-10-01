@@ -1,5 +1,4 @@
-﻿using Bygdrift.DataLakeTools;
-using Bygdrift.Warehouse.Helpers.Logs;
+﻿using Bygdrift.Tools.LogTool.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Module.AppFunctions;

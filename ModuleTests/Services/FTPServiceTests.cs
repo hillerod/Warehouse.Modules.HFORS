@@ -1,6 +1,7 @@
 ﻿using Bygdrift.Warehouse;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Module;
+using System;
 using System.Linq;
 
 namespace ModuleTests.Services

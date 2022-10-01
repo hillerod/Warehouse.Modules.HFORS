@@ -1,4 +1,4 @@
-﻿using Bygdrift.Warehouse.Helpers.Attributes;
+﻿using Bygdrift.Warehouse.Attributes;
 
 namespace Module
 {
@@ -9,5 +9,8 @@ namespace Module
 
         [ConfigSecret(NotSet = NotSet.ThrowError)]
         public string FTPConnectionMeterReadings { get; set; }
+
+        [ConfigSetting(NotSet = NotSet.ShowLogInfo, Default = 6, ErrorMessage = "MonthsToKeepMeteringsPerHour is not set, so as standard, it is set to 6 months.")]
+        public int MonthsToKeepMeteringsPerHour { get; set; }
     }
 }

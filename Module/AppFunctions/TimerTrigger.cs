@@ -1,7 +1,10 @@
+using Bygdrift.Tools.CsvTool;
+using Bygdrift.Tools.CsvTool.TimeStacking;
 using Bygdrift.Warehouse;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Module.Services;
+using System;
 using System.Threading.Tasks;
 
 namespace Module.AppFunctions
@@ -18,8 +21,10 @@ namespace Module.AppFunctions
             App.Log.LogInformation($"The module '{App.ModuleName}' is started");
 
             var ftpService = new FTPService(App, App.Settings.FTPConnectionMeterReadings);
+            var consumptionRefine = new Refines.ConsumptionRefine(App);
+
             foreach (var file in ftpService.GetData())
-                await Refines.ConsumptionRefine.Refine(App, file);
+                await consumptionRefine.Refine(file, true, true);
 
             Refines.EK109ExplanationTables.Refine(App);
             ftpService.MoveFolderContent("Backup");
@@ -30,6 +35,9 @@ namespace Module.AppFunctions
                 await Refines.CustomerDataRefine.Refine(App, file);
 
             ftpService.Close();
+
+            var timeToKeepMeteringsPerHour = DateTime.Now.AddMonths(-App.Settings.MonthsToKeepMeteringsPerHour);
+            App.Mssql.DeleteOldRows("ForbrugPrTime", "Fra", timeToKeepMeteringsPerHour);
         }
     }
 }

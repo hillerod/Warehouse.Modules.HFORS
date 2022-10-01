@@ -1,4 +1,5 @@
-﻿using Bygdrift.CsvTools;
+﻿using Bygdrift.Tools.CsvTool;
+using Bygdrift.Warehouse;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,14 +14,21 @@ namespace Module.Refines.Helpers
     public class EK109
     {
         private static readonly CultureInfo pointCulture = new("en-US");
+        private readonly AppBase app;
+        private readonly Config csvConfig;
+
+        public EK109(AppBase app, Config csvConfig)
+        {
+            this.app = app;
+            this.csvConfig = csvConfig;
+        }
 
         /// <summary>
         /// Translates KMD's weird standard 'EK109' into correct CSV
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="addId">Adds a column of data and meteringId</param>
-        /// <returns></returns>
-        public static Csv ToCsv(Stream stream, bool addId)
+        public Csv ToCsv(Stream stream, bool addId)
         {
             if (stream == null || stream.Length == 0)
                 return null;
@@ -29,9 +37,9 @@ namespace Module.Refines.Helpers
             return Ek109ToCsv(dataSets, addId);
         }
 
-        private static Csv Ek109ToCsv(List<EK109DataSet> dataSets, bool addId)
+        private Csv Ek109ToCsv(List<EK109DataSet> dataSets, bool addId)
         {
-            var csv = new Csv();
+            var csv = new Csv(csvConfig);
             if (addId)
                 csv.AddHeader("Id");
 
@@ -49,29 +57,33 @@ namespace Module.Refines.Helpers
                         csv.AddHeader(++col, $"{header.Navn}_Enhed");
                         csv.AddHeader(++col, $"{header.Navn}_Type");
                     }
+
                 foreach (var dRow in dataSet.Rows)
                 {
-                    var c = 1;
-                    var row = new Dictionary<int, object>();
-                    if (addId)
-                        row.Add(c++, dRow.Målernummer + "_" + dRow.Aflæst.ToString("yyyyMMddTHHmmss"));
-                    
-                    row.Add(c++, dRow.Installation);
-                    row.Add(c++, dRow.Målernummer);
-                    row.Add(c++, dRow.Energiartskode);
-                    row.Add(c++, dRow.Aflæst);
-                    row.Add(c++, dRow.GældendeFra);
-                    row.Add(c++, dRow.Note);
-
-                    foreach (var value in dRow.Values)
+                    if (dRow.Values.Sum(o => o.Værdi) > 0)  //If all values are 0, then there's an error and no reason to use it
                     {
-                        var lookedUpCol = headers[value.Art];
-                        row.Add(lookedUpCol.Col, value.Værdi);
-                        row.Add(lookedUpCol.Col + 1, value.Enhed);
-                        row.Add(lookedUpCol.Col + 2, lookedUpCol.Type);
-                    }
+                        var c = 1;
+                        var row = new Dictionary<int, object>();
+                        if (addId)
+                            row.Add(c++, dRow.Målernummer + "-" + dRow.Aflæst.ToString("yyyyMMddTHHmmss"));
 
-                    csv.AddRow(row);
+                        row.Add(c++, dRow.Installation);
+                        row.Add(c++, dRow.Målernummer);
+                        row.Add(c++, dRow.Energiartskode);
+                        row.Add(c++, dRow.Aflæst);
+                        row.Add(c++, dRow.GældendeFra);
+                        row.Add(c++, dRow.Note);
+
+                        foreach (var value in dRow.Values)
+                        {
+                            var lookedUpCol = headers[value.Art];
+                            row.Add(lookedUpCol.Col, value.Værdi);
+                            row.Add(lookedUpCol.Col + 1, value.Enhed);
+                            row.Add(lookedUpCol.Col + 2, lookedUpCol.Type);
+                        }
+
+                        csv.AddRow(row);
+                    }
                 }
             }
             return csv;

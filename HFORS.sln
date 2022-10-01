@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31515.178
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32002.185
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Module", "Module\Module.csproj", "{B7A2B102-CF87-4641-A66E-C0FB6F82C448}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModuleTests", "ModuleTests\ModuleTests.csproj", "{AE30F942-C9B9-4114-86AF-E5F9E438946C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleTests", "ModuleTests\ModuleTests.csproj", "{AE30F942-C9B9-4114-86AF-E5F9E438946C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse", "..\..\Warehouse\Warehouse\Warehouse.csproj", "{F286281A-1059-4458-AD3D-E3EA7E9F9C16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{AE30F942-C9B9-4114-86AF-E5F9E438946C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE30F942-C9B9-4114-86AF-E5F9E438946C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE30F942-C9B9-4114-86AF-E5F9E438946C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F286281A-1059-4458-AD3D-E3EA7E9F9C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F286281A-1059-4458-AD3D-E3EA7E9F9C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F286281A-1059-4458-AD3D-E3EA7E9F9C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F286281A-1059-4458-AD3D-E3EA7E9F9C16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
