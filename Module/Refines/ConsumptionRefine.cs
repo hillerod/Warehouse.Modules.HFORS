@@ -1,6 +1,5 @@
 ﻿using Bygdrift.Tools.CsvTool;
 using Bygdrift.Tools.CsvTool.TimeStacking;
-using Bygdrift.Tools.CsvTool.TimeStacking.Models;
 using Bygdrift.Tools.DataLakeTool;
 using Bygdrift.Warehouse;
 using System;
@@ -13,12 +12,11 @@ namespace Module.Refines
     public class ConsumptionRefine
     {
         private readonly AppBase<Settings> app;
-        private readonly Config Csvconfig;
-       
+
         public ConsumptionRefine(AppBase<Settings> app)
         {
             this.app = app;
-            Csvconfig = new Config(this.app.CultureInfo, this.app.TimeZoneInfo, FormatKind.TimeOffset);
+            app.CsvConfig.FormatKind = FormatKind.TimeOffsetDST;
         }
 
         public async Task Refine((DateTime Saved, string Name, Stream stream) file, bool saveToDataLake, bool saveToDatabase)
@@ -27,18 +25,15 @@ namespace Module.Refines
             app.LoadedLocal = file.Saved;
             await ToDataLake(file, "Raw", saveToDataLake);
 
-            var csvForbrug = new Helpers.EK109(app, Csvconfig).ToCsv(file.stream, true);
-            //csvForbrug = csvForbrug.FilterRows("Målernummer", true, 65674941);
-
+            var csvForbrug = new Helpers.EK109(app.CsvConfig).ToCsv(file.stream, true);
+            ToDb(csvForbrug, "Forbrug", saveToDatabase);
             await ToDataLake(csvForbrug, "Refined", $"Forbrug_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+
             if (csvForbrug.Records.Count == 0)
                 return;
 
-            ToDb(csvForbrug, "Forbrug", saveToDatabase);
-
             var csvForbrugPrTime = GetPartitionedCsvPerHour(csvForbrug);
             ToDb(csvForbrugPrTime, "ForbrugPrTime", saveToDatabase);
-            //csvForbrugPrTime.ToCsvFile("c:\\Users\\kenbo\\Downloads\\ff.csv");
             await ToDataLake(csvForbrugPrTime, "Refined", $"ForbrugPrTime_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
 
             (DateTime From, DateTime To) = GetTimespanFromCsvPerHour(csvForbrugPrTime);
@@ -49,25 +44,27 @@ namespace Module.Refines
             var csvForbrugPrMåned = GetPartitionedCsvPerMonth(From, To);
             ToDb(csvForbrugPrMåned, "ForbrugPrMåned", saveToDatabase);
             await ToDataLake(csvForbrugPrMåned, "Refined", $"ForbrugPrMåned_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+
+            var ImporteredeFilerCsv = GetFileLog(file, csvForbrug);
+            ToDb(ImporteredeFilerCsv, "FilerImporteret", saveToDatabase, "Fil");
         }
 
         public Csv GetPartitionedCsvPerHour(Csv csv)
         {
-            var res = new Csv(Csvconfig);
-            var sql = $"SELECT * FROM (SELECT *,ROW_NUMBER() OVER (PARTITION BY Målernummer ORDER BY Aflæst DESC) AS [ROW NUMBER] FROM [{app.ModuleName}].[Forbrug]) groups WHERE groups.[ROW NUMBER] = 1 ORDER BY groups.Aflæst DESC";  //Inspiration: https://www.tutorialgateway.org/retrieve-last-record-for-each-group-in-sql-server/
-            var LastRowInEachGroup = app.Mssql.GetAsCsvQuery(sql);
-            var csvMerged = csv.FromCsv(LastRowInEachGroup, false);
-            var meteringIdCols = csv.GetColRecords<string>("Målernummer").Select(o => o.Value).Distinct();
-            var timeStack = CreateTimeStack(csvMerged, "Aflæst");
-            var spans = timeStack.GetSpansPerHour();
-            res = res.FromCsv(timeStack.GetTimeStackedCsv(spans), false);
+            var lastImport = app.Mssql.GetFirstAndLastAscending<DateTimeOffset>("FilerImporteret", "AflæstMin", false).Last;
+            var whereClause = "WHERE groups.[ROW NUMBER] = 1 " + (lastImport > new DateTimeOffset(2000, 1, 1, 0,0,0, new TimeSpan()) ? $"AND Aflæst >= '{app.CsvConfig.DateHelper.DateTimeToString(lastImport)}'" : "");
 
-            return res;
+            var sql = $"SELECT * FROM (SELECT *,ROW_NUMBER() OVER (PARTITION BY Målernummer ORDER BY Aflæst DESC) AS [ROW NUMBER] FROM [{app.ModuleName}].[Forbrug]) groups {whereClause} ORDER BY groups.Aflæst DESC";  //Inspiration: https://www.tutorialgateway.org/retrieve-last-record-for-each-group-in-sql-server/
+            var LastRowInEachGroupCsv = app.Mssql.GetAsCsvQuery(sql);
+
+            var csvMerged = csv.FromCsv(LastRowInEachGroupCsv, false);
+            var timeStack = CreateTimeStack(csvMerged, "Aflæst");
+            var spansPerHour = timeStack.GetSpansPerHour();
+            return timeStack.GetTimeStackedCsv(spansPerHour, app.CsvConfig);
         }
 
         public Csv GetPartitionedCsvPerDay(DateTime from, DateTime to)
         {
-            var res = new Csv(Csvconfig);
             var fromDay = from.Date;
             var toDay = to.Date.AddDays(1);
             var sql = $"SELECT * FROM [{app.ModuleName}].[ForbrugPrTime] where Fra >= '{fromDay:s}' AND Til <= '{toDay:s}'";
@@ -78,13 +75,11 @@ namespace Module.Refines
             var meteringIdCols = csvPerHour.GetColRecords<string>("Målernummer").Select(o => o.Value).Distinct();
             var timeStack = CreateTimeStack(csvPerHour, "Fra", "Til");
             var spansPerDay = timeStack.GetSpansPerDay();
-            res = res.FromCsv(timeStack.GetTimeStackedCsv(spansPerDay), false);
-            return res;
+            return timeStack.GetTimeStackedCsv(spansPerDay, app.CsvConfig);
         }
 
         public Csv GetPartitionedCsvPerMonth(DateTime from, DateTime to)
         {
-            var res = new Csv(Csvconfig);
             var fromMonth = new DateTime(from.Year, from.Month, 1);
             var toMonth = new DateTime(to.Year, to.AddMonths(1).Month, 1);
             var sql = $"SELECT * FROM [{app.ModuleName}].[ForbrugPrDag] where Fra >= '{fromMonth:s}' AND Til <= '{toMonth:s}'";
@@ -92,9 +87,22 @@ namespace Module.Refines
 
             var meteringIdCols = csvPerDay.GetColRecords<string>("Målernummer").Select(o => o.Value).Distinct();
             var timeStack = CreateTimeStack(csvPerDay, "Fra", "Til");
-            var spansMonth = timeStack.GetSpansPerMonth();
-            res = res.FromCsv(timeStack.GetTimeStackedCsv(spansMonth), false);
-            return res;
+            var spansPerMonth = timeStack.GetSpansPerMonth();
+            return timeStack.GetTimeStackedCsv(spansPerMonth, app.CsvConfig);
+        }
+
+        private Csv GetFileLog((DateTime Saved, string Name, Stream stream) file, Csv csvForbrug)
+        {
+            var aflæstCol = csvForbrug.GetColRecords<DateTimeOffset>("Aflæst", false);
+            var aflæstMin = aflæstCol.Min(o => o.Value);
+            var aflæstMax = aflæstCol.Max(o => o.Value);
+
+            return new Csv(app.CsvConfig)
+                .AddRecord(1, "Fil", file.Name)
+                .AddRecord(1, "Oprettelsesdato", app.CsvConfig.DateHelper.Now())
+                .AddRecord(1, "FilGemt", file.Saved)
+                .AddRecord(1, "AflæstMin", aflæstMin)
+                .AddRecord(1, "AflæstMax", aflæstMax);
         }
 
         /// <exception cref="ArgumentException">There has to be records in csvPerHour so it should be cheked before calling this method.</exception>
@@ -116,33 +124,32 @@ namespace Module.Refines
         {
             var timeStack = !string.IsNullOrEmpty(headerNameTo) ? new TimeStack(csvMerged, "Målernummer", headerNameFrom, headerNameTo) : new TimeStack(csvMerged, "Målernummer", headerNameFrom);
             timeStack.AddInfoFormat("Id", "[:Group]-[:From:yyyyMMddTHH]")
-                    //.AddInfoFormat("Målernummer", "[:Group]")
                     .AddCalcFirstNotNull("Målernummer")
                     .AddInfoFrom("Fra")
                     .AddInfoTo("Til")
                     .AddCalcSum("Energi_Værdi", null, true)
-                    .AddCalcFirstNotNull("Energi_Enhed")
-                    .AddCalcFirstNotNull("Energi_Type")
+                    //.AddCalcFirstNotNull("Energi_Enhed")
+                    //.AddCalcFirstNotNull("Energi_Type")
                     .AddCalcSum("Volumen_Værdi", null, true)
-                    .AddCalcFirstNotNull("Volumen_Enhed")
-                    .AddCalcFirstNotNull("Volumen_Type")
+                    //.AddCalcFirstNotNull("Volumen_Enhed")
+                    //.AddCalcFirstNotNull("Volumen_Type")
                     //.AddCalcAny("Timer_Værdi")
                     //.AddCalcAny("Timer_Enhed")
                     //.AddCalcAny("Timer_Type")
                     .AddCalcAverage("Fremløb_Værdi")
-                    .AddCalcFirstNotNull("Fremløb_Enhed")
-                    .AddCalcFirstNotNull("Fremløb_Type")
-                    .AddCalcAverage("Returløb_Værdi")
-                    .AddCalcFirstNotNull("Returløb_Enhed")
-                    .AddCalcFirstNotNull("Returløb_Type")
-                    .AddCalcFirstNotNull("Energiartskode");
+                    //.AddCalcFirstNotNull("Fremløb_Enhed")
+                    //.AddCalcFirstNotNull("Fremløb_Type")
+                    .AddCalcAverage("Returløb_Værdi");
+                    //.AddCalcFirstNotNull("Returløb_Enhed")
+                    //.AddCalcFirstNotNull("Returløb_Type")
+                    //.AddCalcFirstNotNull("Energiartskode");
             return timeStack;
         }
 
-        private void ToDb(Csv csvForbrugPrTime, string table, bool saveToDb)
+        private void ToDb(Csv csvForbrugPrTime, string table, bool saveToDb, string columnId = "Id")
         {
             if (saveToDb)
-                app.Mssql.MergeCsv(csvForbrugPrTime, table, "Id", false, true);
+                app.Mssql.MergeCsv(csvForbrugPrTime, table, columnId, false, true);
         }
 
         private async Task ToDataLake((DateTime Saved, string Name, Stream stream) file, string path, bool saveToDataLake)

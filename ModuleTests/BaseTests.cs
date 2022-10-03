@@ -19,7 +19,7 @@ namespace ModuleTests
 
         public BaseTests()
         {
-            CsvConfig = new Config(App.CultureInfo, App.TimeZoneInfo, FormatKind.TimeOffset);
+            CsvConfig = new Config(App.CultureInfo, App.TimeZoneInfo, FormatKind.TimeOffsetDST);
 
             if (App.Mssql.ConnectionString.Contains("localdb", StringComparison.OrdinalIgnoreCase))  //Then it's local
                 Assert.IsNull(App.Mssql.DeleteAllTables());

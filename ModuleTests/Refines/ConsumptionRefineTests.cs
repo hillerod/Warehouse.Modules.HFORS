@@ -29,7 +29,7 @@ namespace ModuleTests.Refines
             var fileName = "Hillerod-Kommune-EK109-20220311T022304.csv";
             var importPath = Path.Combine(BasePath, "Files", "FromFTP", fileName);
             var stream = new FileStream(importPath, FileMode.Open);
-            return new Module.Refines.Helpers.EK109(App, CsvConfig).ToCsv(stream, true);
+            return new Module.Helpers.EK109(CsvConfig).ToCsv(stream, true);
         }
     }
 }

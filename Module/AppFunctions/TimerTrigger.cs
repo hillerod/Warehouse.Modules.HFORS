@@ -1,5 +1,3 @@
-using Bygdrift.Tools.CsvTool;
-using Bygdrift.Tools.CsvTool.TimeStacking;
 using Bygdrift.Warehouse;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;

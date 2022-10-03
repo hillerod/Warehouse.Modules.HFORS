@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.6.11.53198",
-      "templateHash": "6166399124007717236"
+      "version": "0.6.18.56646",
+      "templateHash": "7494362408219271240"
     }
   },
   "parameters": {
@@ -38,6 +38,13 @@
       "defaultValue": "Romance Standard Time",
       "metadata": {
         "description": "\"Romance Standard Time\" is Copenhagen. For other timezones, find them here: https://raw.githubusercontent.com/Bygdrift/Warehouse/master/Docs/TimeZoneIds.csv"
+      }
+    },
+    "cultureName": {
+      "type": "string",
+      "defaultValue": "da-DK",
+      "metadata": {
+        "description": "\"da-DK\" is Denmark"
       }
     }
   },
@@ -112,6 +119,10 @@
             {
               "name": "ScheduleExpression",
               "value": "[parameters('ScheduleExpression')]"
+            },
+            {
+              "name": "CultureName",
+              "value": "[parameters('cultureName')]"
             },
             {
               "name": "TimeZoneId",

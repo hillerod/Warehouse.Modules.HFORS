@@ -14,21 +14,21 @@ namespace ModuleTests
     [TestClass]
     public class LoadFromFiles : BaseTests
     {
-        [TestMethod]
+        //[TestMethod]
         public async Task Start()
         {
-            int? take = 1;
+            int? take = null;
             IEnumerable<File> files = LoadAllCsv().OrderBy(o => o.Date);
             if (take != null)
-               files = files.Take((int)take);
+                files = files.Take((int)take);
 
             var refine = new ConsumptionRefine(App);
             var counter = 1;
             foreach (var item in files)
             {
-                App.Log.LogInformation($"Loading {counter++} of {files.Count()}...");
+                App.Log.LogInformation($"Loadet {Math.Round(counter++ / (decimal)files.Count() * 100, 1)} %...");
                 App.LoadedLocal = item.Date;
-                await refine.Refine(item.GetFile(), false, true);
+                await refine.Refine(item.GetFile(), true, true);
                 Assert.IsFalse(App.Log.HasErrorsOrCriticals());
             }
         }

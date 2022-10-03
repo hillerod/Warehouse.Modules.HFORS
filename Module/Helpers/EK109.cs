@@ -1,12 +1,11 @@
 ﻿using Bygdrift.Tools.CsvTool;
-using Bygdrift.Warehouse;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Module.Refines.Helpers
+namespace Module.Helpers
 {
     /// <summary>
     /// Translates KMD's weird standard 'EK109' into correct CSV
@@ -14,12 +13,10 @@ namespace Module.Refines.Helpers
     public class EK109
     {
         private static readonly CultureInfo pointCulture = new("en-US");
-        private readonly AppBase app;
         private readonly Config csvConfig;
 
-        public EK109(AppBase app, Config csvConfig)
+        public EK109(Config csvConfig)
         {
-            this.app = app;
             this.csvConfig = csvConfig;
         }
 

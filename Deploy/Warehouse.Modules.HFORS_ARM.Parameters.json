@@ -16,6 +16,9 @@
         },
         "TimeZoneId": {
             "value": "Romance Standard Time"
+        },
+        "CultureName": {
+            "value": "da-DK"
         }
     }
 }
