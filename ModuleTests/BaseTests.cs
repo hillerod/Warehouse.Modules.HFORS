@@ -1,5 +1,4 @@
 ﻿using Bygdrift.Tools.CsvTool;
-using Bygdrift.Tools.LogTool;
 using Bygdrift.Tools.MssqlTool;
 using Bygdrift.Warehouse;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

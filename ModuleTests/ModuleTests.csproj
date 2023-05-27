@@ -3,11 +3,6 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Compile Remove="Files\NewFolder\**" />
-	  <EmbeddedResource Remove="Files\NewFolder\**" />
-	  <None Remove="Files\NewFolder\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<!--<PackageReference Include="Bygdrift.Warehouse" Version="1.0.3" />-->

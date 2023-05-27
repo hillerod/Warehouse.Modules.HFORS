@@ -14,7 +14,11 @@ namespace Module.AppFunctions
         public AppBase<Settings> App { get; private set; }
 
         [FunctionName(nameof(TimerTriggerAsync))]
-        public async Task TimerTriggerAsync([TimerTrigger("%ScheduleExpression%", RunOnStartup = true)] TimerInfo myTimer)
+        public async Task TimerTriggerAsync([TimerTrigger("%ScheduleExpression%"
+#if DEBUG
+            , RunOnStartup = true
+#endif
+	)] TimerInfo myTimer)
         {
             App.Log.LogInformation($"The module '{App.ModuleName}' is started");
 
