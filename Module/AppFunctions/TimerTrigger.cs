@@ -23,23 +23,28 @@ namespace Module.AppFunctions
             App.Log.LogInformation($"The module '{App.ModuleName}' is started");
 
             var ftpService = new FTPService(App, App.Settings.FTPConnectionMeterReadings);
+            var ftpDeliver = new FTPService(App, App.Settings.FTPConnectionDeliverToME2);
             var consumptionRefine = new Refines.ConsumptionRefine(App);
 
             foreach (var file in ftpService.GetData())
+            {
                 await consumptionRefine.Refine(file, true, true);
+                ftpDeliver.AddContent(file.Name, file.stream);
+            }
 
-            Refines.EK109ExplanationTables.Refine(App);
-            ftpService.MoveFolderContent("Backup");
+            //Refines.EK109ExplanationTables.Refine(App);
+            //ftpService.MoveFolderContent("Backup");
             ftpService.Close();
+            ftpDeliver.Close();
 
-            ftpService = new FTPService(App, App.Settings.FTPConnectionCustomerData);
-            foreach (var file in ftpService.GetData())
-                await Refines.CustomerDataRefine.Refine(App, file);
+            //ftpService = new FTPService(App, App.Settings.FTPConnectionCustomerData);
+            //foreach (var file in ftpService.GetData())
+            //    await Refines.CustomerDataRefine.Refine(App, file);
 
-            ftpService.Close();
+            //ftpService.Close();
 
-            var timeToKeepMeteringsPerHour = DateTime.Now.AddMonths(-App.Settings.MonthsToKeepMeteringsPerHour);
-            App.Mssql.DeleteOldRows("ForbrugPrTime", "Fra", timeToKeepMeteringsPerHour);
+            //var timeToKeepMeteringsPerHour = DateTime.Now.AddMonths(-App.Settings.MonthsToKeepMeteringsPerHour);
+            //App.Mssql.DeleteOldRows("ForbrugPrTime", "Fra", timeToKeepMeteringsPerHour);
         }
     }
 }

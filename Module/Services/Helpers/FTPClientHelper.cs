@@ -2,17 +2,20 @@
 
 namespace Module.Services
 {
-    public class FTPClientHelper : SftpClient
+    public class FTPClientHelper
     {
-        public static string Path { get; private set; }
+        public  string Path { get; private set; }
 
-        public static string Host { get; private set; }
+        public  string Host { get; private set; }
+        public  SftpClient Client { get; private set; }
 
-        public FTPClientHelper(string connectionString) : base(CreateConnectionInfo(connectionString))
+        public FTPClientHelper(string connectionString)
         {
+            var connection = CreateConnectionInfo(connectionString);
+            Client = new SftpClient(connection);
         }
 
-        private static ConnectionInfo CreateConnectionInfo(string connectionString)
+        private ConnectionInfo CreateConnectionInfo(string connectionString)
         {
             var user = "";
             var pass = "";

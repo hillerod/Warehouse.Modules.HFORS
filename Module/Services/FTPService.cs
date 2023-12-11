@@ -8,15 +8,15 @@ namespace Module.Services
 {
     public class FTPService
     {
-        private readonly FTPClientHelper client;
+        private readonly FTPClientHelper ftp;
         public FTPService(AppBase<Settings> app, string connectionString)
         {
             App = app;
-            client = new FTPClientHelper(connectionString);
+            ftp = new FTPClientHelper(connectionString);
             try
             {
-                client.Connect();
-                App.Log.LogInformation($"Connected to ftp: {FTPClientHelper.Host}, at path: {FTPClientHelper.Path}.");
+                ftp.Client.Connect();
+                App.Log.LogInformation($"Connected to ftp: {ftp.Host}, at path: {ftp.Path}.");
             }
             catch (Exception)
             {
@@ -31,22 +31,34 @@ namespace Module.Services
         {
             var count = 0;
             
-            string combinedPath = FTPClientHelper.Path;
+            string combinedPath = ftp.Path;
             if(!string.IsNullOrEmpty(path))
                 combinedPath = Path.Combine(combinedPath, path);
 
-            foreach (var item in client.ListDirectory(combinedPath).Where(o => !o.IsDirectory))
+            foreach (var item in ftp.Client.ListDirectory(combinedPath).Where(o => !o.IsDirectory))
             {
                 if (take != null && count++ == take)
                     break;
 
                 App.Log.LogInformation($"- File: {item.FullName}. Created: {item.LastWriteTime}. Bytes: {item.Length}");
-                var sourceFilePath = FTPClientHelper.Path + "/" + item.Name;
+                var sourceFilePath = ftp.Path + "/" + item.Name;
                 var extension = Path.GetExtension(item.FullName).ToLower();
                 var stream = new MemoryStream();
-                client.DownloadFile(sourceFilePath, stream);
+                ftp.Client.DownloadFile(sourceFilePath, stream);
                 yield return (item.LastAccessTime, item.Name, stream);
             }
+        }
+
+        /// <summary>
+        /// Copies content from current folder and over to another folder
+        /// </summary>
+        public void AddContent(string name, Stream stream)
+        {
+            if (!ftp.Client.Exists(ftp.Path))
+                ftp.Client.CreateDirectory(ftp.Path);
+
+            var path = ftp.Path + "/" + name;
+            ftp.Client.UploadFile(stream, path);
         }
 
         /// <summary>
@@ -55,20 +67,20 @@ namespace Module.Services
         /// <param name="folderName">A name like "backup"</param>
         public void MoveFolderContent(string folderName)
         {
-            var backupFolder = FTPClientHelper.Path + "/" + folderName;
-            if (!client.Exists(backupFolder))
-                client.CreateDirectory(backupFolder);
+            var backupFolder = ftp.Path + "/" + folderName;
+            if (!ftp.Client.Exists(backupFolder))
+                ftp.Client.CreateDirectory(backupFolder);
 
-            foreach (var item in client.ListDirectory(FTPClientHelper.Path).Where(o => !o.IsDirectory))
+            foreach (var item in ftp.Client.ListDirectory(ftp.Path).Where(o => !o.IsDirectory))
             {
-                var sourceFilePath = FTPClientHelper.Path + "/" + item.Name;
+                var sourceFilePath = ftp.Path + "/" + item.Name;
                 var backupFilePath = backupFolder + "/" + item.Name;
-                if (!client.Exists(backupFilePath))
+                if (!ftp.Client.Exists(backupFilePath))
                 {
                     using var stream = new MemoryStream();
-                    client.DownloadFile(sourceFilePath, stream);
-                    client.UploadFile(stream, backupFilePath);
-                    client.DeleteFile(sourceFilePath);
+                    ftp.Client.DownloadFile(sourceFilePath, stream);
+                    ftp.Client.UploadFile(stream, backupFilePath);
+                    ftp.Client.DeleteFile(sourceFilePath);
                 }
             }
         }
@@ -78,10 +90,10 @@ namespace Module.Services
         /// </summary>
         public void DeleteFolderContent()
         {
-            foreach (var item in client.ListDirectory(FTPClientHelper.Path).Where(o => !o.IsDirectory))
+            foreach (var item in ftp.Client.ListDirectory(ftp.Path).Where(o => !o.IsDirectory))
             {
-                var sourceFilePath = FTPClientHelper.Path + "/" + item.Name;
-                client.DeleteFile(sourceFilePath);
+                var sourceFilePath = ftp.Path + "/" + item.Name;
+                ftp.Client.DeleteFile(sourceFilePath);
             }
         }
 
@@ -90,10 +102,10 @@ namespace Module.Services
         /// </summary>
         public void Close()
         {
-            if(client != null)
+            if(ftp != null)
             {
-                client.Disconnect();
-                client.Dispose();
+                ftp.Client.Disconnect();
+                ftp.Client.Dispose();
             }
         }
     }

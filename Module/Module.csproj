@@ -3,7 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<OutputType>Library</OutputType>
-		<Version>0.2.2</Version>
+		<Version>0.2.3</Version>
 		<PackageId>hillerod.Warehouse.Modules.HFORS</PackageId>
 		<Authors>Kenboc</Authors>
 		<Company>Bygdrift</Company>
@@ -27,5 +27,9 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Properties\PublishProfiles\" />
 	</ItemGroup>
 </Project>

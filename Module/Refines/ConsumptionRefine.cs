@@ -25,28 +25,28 @@ namespace Module.Refines
             app.LoadedLocal = file.Saved;
             await ToDataLake(file, "Raw", saveToDataLake);
 
-            var csvForbrug = new Helpers.EK109(app.CsvConfig).ToCsv(file.stream, true);
-            ToDb(csvForbrug, "Forbrug", saveToDatabase);
-            await ToDataLake(csvForbrug, "Refined", $"Forbrug_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+            //var csvForbrug = new Helpers.EK109(app.CsvConfig).ToCsv(file.stream, true);
+            //ToDb(csvForbrug, "Forbrug", saveToDatabase);
+            //await ToDataLake(csvForbrug, "Refined", $"Forbrug_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
 
-            if (csvForbrug.Records.Count == 0)
-                return;
+            //if (csvForbrug.Records.Count == 0)
+            //    return;
 
-            var csvForbrugPrTime = GetPartitionedCsvPerHour(csvForbrug);
-            ToDb(csvForbrugPrTime, "ForbrugPrTime", saveToDatabase);
-            await ToDataLake(csvForbrugPrTime, "Refined", $"ForbrugPrTime_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+            //var csvForbrugPrTime = GetPartitionedCsvPerHour(csvForbrug);
+            //ToDb(csvForbrugPrTime, "ForbrugPrTime", saveToDatabase);
+            //await ToDataLake(csvForbrugPrTime, "Refined", $"ForbrugPrTime_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
 
-            (DateTime From, DateTime To) = GetTimespanFromCsvPerHour(csvForbrugPrTime);
-            var csvForbrugPrDag = GetPartitionedCsvPerDay(From, To);
-            ToDb(csvForbrugPrDag, "ForbrugPrDag", saveToDatabase);
-            await ToDataLake(csvForbrugPrDag, "Refined", $"ForbrugPrDag_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+            //(DateTime From, DateTime To) = GetTimespanFromCsvPerHour(csvForbrugPrTime);
+            //var csvForbrugPrDag = GetPartitionedCsvPerDay(From, To);
+            //ToDb(csvForbrugPrDag, "ForbrugPrDag", saveToDatabase);
+            //await ToDataLake(csvForbrugPrDag, "Refined", $"ForbrugPrDag_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
 
-            var csvForbrugPrMåned = GetPartitionedCsvPerMonth(From, To);
-            ToDb(csvForbrugPrMåned, "ForbrugPrMåned", saveToDatabase);
-            await ToDataLake(csvForbrugPrMåned, "Refined", $"ForbrugPrMåned_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
+            //var csvForbrugPrMåned = GetPartitionedCsvPerMonth(From, To);
+            //ToDb(csvForbrugPrMåned, "ForbrugPrMåned", saveToDatabase);
+            //await ToDataLake(csvForbrugPrMåned, "Refined", $"ForbrugPrMåned_{file.Saved:yyyyMMddTHHmmss}.csv", saveToDataLake);
 
-            var ImporteredeFilerCsv = GetFileLog(file, csvForbrug);
-            ToDb(ImporteredeFilerCsv, "FilerImporteret", saveToDatabase, "Fil");
+            //var ImporteredeFilerCsv = GetFileLog(file, csvForbrug);
+            //ToDb(ImporteredeFilerCsv, "FilerImporteret", saveToDatabase, "Fil");
         }
 
         public Csv GetPartitionedCsvPerHour(Csv csv)
