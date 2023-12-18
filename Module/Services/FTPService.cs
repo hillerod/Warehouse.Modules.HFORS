@@ -58,6 +58,7 @@ namespace Module.Services
                 ftp.Client.CreateDirectory(ftp.Path);
 
             var path = ftp.Path + "/" + name;
+            stream.Position = 0;
             ftp.Client.UploadFile(stream, path);
         }
 

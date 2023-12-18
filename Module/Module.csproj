@@ -3,7 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<OutputType>Library</OutputType>
-		<Version>0.2.3</Version>
+		<Version>0.2.4</Version>
 		<PackageId>hillerod.Warehouse.Modules.HFORS</PackageId>
 		<Authors>Kenboc</Authors>
 		<Company>Bygdrift</Company>

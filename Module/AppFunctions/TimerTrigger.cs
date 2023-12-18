@@ -33,7 +33,7 @@ namespace Module.AppFunctions
             }
 
             //Refines.EK109ExplanationTables.Refine(App);
-            //ftpService.MoveFolderContent("Backup");
+            ftpService.MoveFolderContent("Backup");
             ftpService.Close();
             ftpDeliver.Close();
 
