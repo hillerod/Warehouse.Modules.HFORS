@@ -30,9 +30,9 @@ namespace Module.Services
         public IEnumerable<(DateTime Saved, string Name, Stream stream)> GetData(string path = null, int? take = null)
         {
             var count = 0;
-            
+
             string combinedPath = ftp.Path;
-            if(!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path))
                 combinedPath = Path.Combine(combinedPath, path);
 
             foreach (var item in ftp.Client.ListDirectory(combinedPath).Where(o => !o.IsDirectory))
@@ -76,13 +76,13 @@ namespace Module.Services
             {
                 var sourceFilePath = ftp.Path + "/" + item.Name;
                 var backupFilePath = backupFolder + "/" + item.Name;
-                if (!ftp.Client.Exists(backupFilePath))
-                {
-                    using var stream = new MemoryStream();
-                    ftp.Client.DownloadFile(sourceFilePath, stream);
-                    ftp.Client.UploadFile(stream, backupFilePath);
-                    ftp.Client.DeleteFile(sourceFilePath);
-                }
+                //if (!ftp.Client.Exists(backupFilePath))
+                //{
+                using var stream = new MemoryStream();
+                ftp.Client.DownloadFile(sourceFilePath, stream);
+                ftp.Client.UploadFile(stream, backupFilePath);
+                ftp.Client.DeleteFile(sourceFilePath);
+                //}
             }
         }
 
@@ -103,7 +103,7 @@ namespace Module.Services
         /// </summary>
         public void Close()
         {
-            if(ftp != null)
+            if (ftp != null)
             {
                 ftp.Client.Disconnect();
                 ftp.Client.Dispose();
